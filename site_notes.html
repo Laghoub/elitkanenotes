@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Consultation des Notes</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+    body {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .container {
+      background: white;
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 600px;
+      animation: fadeIn 1s ease-in-out;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    input {
+      width: 100%;
+      padding: 0.8rem;
+      margin: 0.5rem 0;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+    }
+    button {
+      width: 100%;
+      padding: 0.8rem;
+      margin-top: 1rem;
+      border: none;
+      background-color: #667eea;
+      color: white;
+      font-weight: bold;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background-color: #5a67d8;
+    }
+    .notes-section {
+      display: none;
+      animation: slideIn 0.5s ease-in-out forwards;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 0.5rem;
+      text-align: center;
+    }
+    .download-btn {
+      margin-top: 1rem;
+      background: #48bb78;
+    }
+    .logo {
+      display: block;
+      margin: 0 auto 1rem auto;
+      max-width: 100px;
+    }
+    .info-eleve {
+      margin-bottom: 1rem;
+      font-weight: bold;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-100px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="login-section">
+    <img src="logo itkan.png" alt="Logo" class="logo" />
+    <h2>Connexion Élève</h2>
+    <input type="text" id="matricule" placeholder="Matricule" />
+    <input type="password" id="password" placeholder="Mot de passe" />
+    <button onclick="login()">Se connecter</button>
+  </div>
+
+  <div class="container notes-section" id="notes-section">
+    <h2>Vos Notes</h2>
+    <div class="info-eleve" id="info-eleve"></div>
+    <table id="notes-table">
+      <thead>
+        <tr>
+          <th>Matière</th>
+          <th>Note</th>
+          <th>Coefficient</th>
+          <th>Observation</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <p><strong>Moyenne :</strong> <span id="moyenne"></span></p>
+    <button class="download-btn" onclick="telechargerPDF()">Télécharger en PDF</button>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+  <script>
+    const data = {
+      "12345": {
+        "password": "test123",
+        "nom": "Ali",
+        "prenom": "Yassine",
+        "notes": {
+          "Math": { note: 14, coef: 5 },
+          "Physique": { note: 13, coef: 4 },
+          "Chimie": { note: 12, coef: 3 },
+          "Français": { note: 15, coef: 2 },
+          "Anglais": { note: 16, coef: 2 }
+        }
+      },
+      "67890": {
+        "password": "bac2024",
+        "nom": "Benali",
+        "prenom": "Sara",
+        "notes": {
+          "Math": { note: 11, coef: 5 },
+          "Physique": { note: 10, coef: 4 },
+          "SVT": { note: 13, coef: 3 },
+          "Français": { note: 12, coef: 2 },
+          "Philosophie": { note: 14, coef: 2 }
+        }
+      }
+    };
+
+    let currentEleve = {};
+
+    function login() {
+      const matricule = document.getElementById('matricule').value;
+      const password = document.getElementById('password').value;
+
+      if (data[matricule] && data[matricule].password === password) {
+        currentEleve = data[matricule];
+        currentEleve.matricule = matricule;
+        afficherNotes(currentEleve.notes);
+        document.getElementById('info-eleve').innerText = `Nom: ${currentEleve.nom} | Prénom: ${currentEleve.prenom} | Matricule: ${matricule}`;
+        document.getElementById('login-section').style.display = 'none';
+        document.getElementById('notes-section').style.display = 'block';
+      } else {
+        alert('Matricule ou mot de passe incorrect');
+      }
+    }
+
+    function afficherNotes(notes) {
+      const tbody = document.querySelector('#notes-table tbody');
+      tbody.innerHTML = '';
+      let total = 0;
+      let coefTotal = 0;
+      for (let matiere in notes) {
+        const { note, coef } = notes[matiere];
+        const observation = note >= 10 ? 'Validé' : 'Non validé';
+        total += note * coef;
+        coefTotal += coef;
+        const row = `<tr><td>${matiere}</td><td>${note}</td><td>${coef}</td><td>${observation}</td></tr>`;
+        tbody.innerHTML += row;
+      }
+      const moyenne = (total / coefTotal).toFixed(2);
+      document.getElementById('moyenne').textContent = moyenne;
+    }
+
+    async function telechargerPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      
+
+      doc.setFontSize(12);
+      doc.text("République Algérienne Démocratique et Populaire", 20, 15);
+      doc.text("Ministère de l’Education Nationale", 20, 22);
+      doc.text("Groupe scolaire privé : Elitkane El Ilmi", 20, 29);
+
+      doc.setFontSize(14);
+      doc.text(`Nom: ${currentEleve.nom} | Prénom: ${currentEleve.prenom} | Matricule: ${currentEleve.matricule}`, 20, 40);
+
+      doc.setFontSize(16);
+      doc.text("Relevé de Notes", 20, 50);
+
+      const rows = [];
+      document.querySelectorAll("#notes-table tbody tr").forEach(tr => {
+        const cols = tr.querySelectorAll("td");
+        rows.push([
+          cols[0].innerText,
+          cols[1].innerText,
+          cols[2].innerText,
+          cols[3].innerText
+        ]);
+      });
+
+      doc.autoTable({
+        head: [["Matière", "Note", "Coefficient", "Observation"]],
+        body: rows,
+        startY: 55
+      });
+
+      const moyenne = document.getElementById('moyenne').textContent;
+      doc.text(`Moyenne: ${moyenne}`, 20, doc.lastAutoTable.finalY + 10);
+
+      const today = new Date();
+      const dateStr = today.toLocaleDateString();
+      doc.text(`Date : ${dateStr}`, 20, doc.lastAutoTable.finalY + 20);
+      doc.text("Signature du Directeur", 140, doc.lastAutoTable.finalY + 20);
+
+      doc.save("notes.pdf");
+    }
+  </script>
+</body>
+</html>
