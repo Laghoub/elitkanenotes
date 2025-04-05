@@ -81,6 +81,12 @@
       margin-bottom: 1rem;
       font-weight: bold;
     }
+    .message-final {
+      margin-top: 2rem;
+      font-size: 0.9rem;
+      color: #555;
+      text-align: center;
+    }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(-20px); }
       to { opacity: 1; transform: translateY(0); }
@@ -98,6 +104,7 @@
     <input type="text" id="matricule" placeholder="Matricule" />
     <input type="password" id="password" placeholder="Mot de passe" />
     <button onclick="login()">Se connecter</button>
+    <p id="error-message" style="color: red; text-align: center; margin-top: 1rem; display: none;">Matricule ou mot de passe incorrect</p>
   </div>
 
   <div class="container notes-section" id="notes-section">
@@ -116,6 +123,7 @@
     </table>
     <p><strong>Moyenne :</strong> <span id="moyenne"></span></p>
     <button class="download-btn" onclick="telechargerPDF()">Télécharger en PDF</button>
+    <p class="message-final">Le fondateur de l'école Abdelhakim ZENNOUCHE et toute son équipe pédagogique vous adressent leurs vœux de réussite pour les Épreuves officielles du BEM et du BAC.</p>
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -153,6 +161,7 @@
     function login() {
       const matricule = document.getElementById('matricule').value;
       const password = document.getElementById('password').value;
+      const errorMessage = document.getElementById('error-message');
 
       if (data[matricule] && data[matricule].password === password) {
         currentEleve = data[matricule];
@@ -162,7 +171,8 @@
         document.getElementById('login-section').style.display = 'none';
         document.getElementById('notes-section').style.display = 'block';
       } else {
-        alert('Matricule ou mot de passe incorrect');
+        errorMessage.style.display = 'block';
+        setTimeout(() => { errorMessage.style.display = 'none'; }, 3000);
       }
     }
 
@@ -192,7 +202,7 @@
       doc.setFontSize(12);
       doc.text("République Algérienne Démocratique et Populaire", 20, 15);
       doc.text("Ministère de l’Education Nationale", 20, 22);
-      doc.text("Groupe scolaire privé : Elitkane El Ilmi", 20, 29);
+      doc.text("Groupe scolaire privé : ITKAN EL ILMI", 20, 29);
 
       doc.setFontSize(14);
       doc.text(`Nom: ${currentEleve.nom} | Prénom: ${currentEleve.prenom} | Matricule: ${currentEleve.matricule}`, 20, 40);
@@ -224,6 +234,10 @@
       const dateStr = today.toLocaleDateString();
       doc.text(`Date : ${dateStr}`, 20, doc.lastAutoTable.finalY + 20);
       doc.text("Signature du Directeur", 140, doc.lastAutoTable.finalY + 20);
+
+      doc.setFontSize(10);
+      doc.text("Le fondateur de l'école Abdelhakim ZENNOUCHE et toute son équipe pédagogique vous souhaitent", 20, 280);
+      doc.text("bon courage et plein de succès pour les Épreuves officielles du BEM et du BAC.", 20, 285);
 
       doc.save("notes.pdf");
     }
