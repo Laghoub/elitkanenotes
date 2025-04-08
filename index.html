@@ -18,6 +18,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      padding: 1rem;
     }
     .container {
       background: white;
@@ -27,6 +28,7 @@
       width: 100%;
       max-width: 700px;
       animation: fadeIn 1s ease-in-out;
+      margin: 2rem 0;
     }
     h2 {
       text-align: center;
@@ -38,6 +40,16 @@
       margin: 0.5rem 0;
       border-radius: 10px;
       border: 1px solid #ccc;
+    }
+    .password-wrapper {
+      position: relative;
+    }
+    .toggle-password {
+      position: absolute;
+      top: 50%;
+      right: 15px;
+      transform: translateY(-50%);
+      cursor: pointer;
     }
     button {
       width: 100%;
@@ -58,6 +70,20 @@
       display: none;
       animation: slideIn 0.5s ease-in-out forwards;
     }
+    .logo {
+      display: block;
+      margin: 0 auto 1rem auto;
+      max-width: 100px;
+    }
+    .info-eleve {
+      margin-bottom: 1rem;
+      font-weight: bold;
+      text-align: center;
+    }
+    .download-btn {
+      margin-top: 1rem;
+      background: #48bb78;
+    }
     table {
       width: 100%;
       border-collapse: collapse;
@@ -67,19 +93,7 @@
       border: 1px solid #ccc;
       padding: 0.5rem;
       text-align: center;
-    }
-    .download-btn {
-      margin-top: 1rem;
-      background: #48bb78;
-    }
-    .logo {
-      display: block;
-      margin: 0 auto 1rem auto;
-      max-width: 100px;
-    }
-    .info-eleve {
-      margin-bottom: 1rem;
-      font-weight: bold;
+      white-space: nowrap;
     }
     .message-footer {
       margin-top: 1.5rem;
@@ -95,6 +109,12 @@
       from { opacity: 0; transform: translateX(-100px); }
       to { opacity: 1; transform: translateX(0); }
     }
+    @media (max-width: 600px) {
+      table {
+        display: block;
+        overflow-x: auto;
+      }
+    }
   </style>
 </head>
 <body>
@@ -102,29 +122,34 @@
     <img src="logo itkan.png" alt="Logo" class="logo" />
     <h2>Connexion Élève</h2>
     <input type="text" id="matricule" placeholder="Matricule" />
-    <input type="password" id="password" placeholder="Mot de passe" />
+    <div class="password-wrapper">
+      <input type="password" id="password" placeholder="Mot de passe" />
+      <span class="toggle-password" onclick="togglePassword()">👁️</span>
+    </div>
     <button onclick="login()">Se connecter</button>
   </div>
 
   <div class="container notes-section" id="notes-section">
     <h2>Vos Notes</h2>
-    <div class="info-eleve" id="info-eleve"></div>
-    <table id="notes-table">
-      <thead>
-        <tr>
-          <th>Matière</th>
-          <th>Note</th>
-          <th>Coefficient</th>
-          <th>Observation</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+       <div class="info-eleve" id="info-eleve"></div>
+    <div style="overflow-x:auto; margin-top: 1rem;">
+      <table id="notes-table">
+        <thead>
+          <tr>
+            <th>Matière</th>
+            <th>Note</th>
+            <th>Coefficient</th>
+            <th>Observation</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
     <p><strong>Moyenne :</strong> <span id="moyenne"></span></p>
     <button class="download-btn" onclick="telechargerPDF()">Télécharger en PDF</button>
     <div class="message-footer">
       Le fondateur de l'école Abdelhakim ZENNOUCHE et toute son équipe pédagogique<br>
-      vous souhaitent courage, réussite et excellence pour les épreuves officielles du BEM et du BAC.
+      vous adressent leurs encouragements chaleureux et vous souhaitent une pleine réussite pour les épreuves du BEM et du BAC.
     </div>
   </div>
 
@@ -133,113 +158,158 @@
   <script>
     const data = {
       "12345": {
-        "password": "test123",
-        "nom": "Ali",
-        "prenom": "Yassine",
-        "notes": {
-          "Langue Arabe": { note: 14, coef: 5 },
-          "Mathématiques": { note: 15, coef: 4 },
-          "Langue Française": { note: 13, coef: 3 },
-          "Langue Anglaise": { note: 12, coef: 2 },
-          "sciences de la vie": { note: 13, coef: 2 },
-          "Physique": { note: 14, coef: 2 },
-          "Histoire géo": { note: 11, coef: 3 },
-          "éducation civique": { note: 16, coef: 1 },
-          "sciences islamique": { note: 17, coef: 2 },
-          "dessin": { note: 15, coef: 1 },
-          "sport": { note: 18, coef: 1 }
+        password: "test123",
+        nom: "Benali",
+        prenom: "Sami",
+        notes: {
+          "Langue Arabe": 16,
+          "Mathématiques": 18,
+          "Langue Française": 12,
+          "Langue Anglaise": 14,
+          "Sciences de la vie": 15,
+          "Physique": 13,
+          "Histoire géo": 10,
+          "Éducation civique": 17,
+          "Sciences islamiques": 18,
+          "Dessin": 13,
+          "Sport": 16
+        },
+        coefficients: {
+          "Langue Arabe": 5,
+          "Mathématiques": 4,
+          "Langue Française": 3,
+          "Langue Anglaise": 2,
+          "Sciences de la vie": 2,
+          "Physique": 2,
+          "Histoire géo": 3,
+          "Éducation civique": 1,
+          "Sciences islamiques": 2,
+          "Dessin": 1,
+          "Sport": 1
         }
       }
     };
 
-    let currentEleve = {};
+    let currentEleve = null;
+
+    function getObservation(note) {
+      if (note >= 17) return "Excellent travail !";
+      if (note >= 14) return "Très bien, continue comme ça.";
+      if (note >= 12) return "Bon, mais peut mieux faire.";
+      if (note >= 10) return "Passable, attention à l'effort.";
+      return "Tu dois faire mieux.";
+    }
 
     function login() {
-      const matricule = document.getElementById('matricule').value;
+      const matricule = document.getElementById('matricule').value.trim();
       const password = document.getElementById('password').value;
 
       if (data[matricule] && data[matricule].password === password) {
         currentEleve = data[matricule];
         currentEleve.matricule = matricule;
-        afficherNotes(currentEleve.notes);
-        document.getElementById('info-eleve').innerText = `Nom: ${currentEleve.nom} | Prénom: ${currentEleve.prenom} | Matricule: ${matricule}`;
-        document.getElementById('login-section').style.display = 'none';
-        document.getElementById('notes-section').style.display = 'block';
+
+        const tableBody = document.querySelector("#notes-table tbody");
+        tableBody.innerHTML = "";
+
+        let total = 0, coefTotal = 0;
+        for (let matiere in currentEleve.notes) {
+          const note = currentEleve.notes[matiere];
+          const coef = currentEleve.coefficients[matiere];
+          const obs = getObservation(note);
+          total += note * coef;
+          coefTotal += coef;
+
+          const row = `<tr>
+            <td>${matiere}</td>
+            <td>${note}</td>
+            <td>${coef}</td>
+            <td>${obs}</td>
+          </tr>`;
+          tableBody.innerHTML += row;
+        }
+
+        const moyenne = (total / coefTotal).toFixed(2);
+        document.getElementById("moyenne").textContent = moyenne;
+        document.getElementById("info-eleve").textContent =
+          `Nom: ${currentEleve.nom} | Prénom: ${currentEleve.prenom} | Matricule: ${matricule}`;
+        document.getElementById("login-section").style.display = "none";
+        document.getElementById("notes-section").style.display = "block";
       } else {
-        alert('Matricule ou mot de passe incorrect');
+        alert("Matricule ou mot de passe incorrect");
       }
     }
 
-    function afficherNotes(notes) {
-      const tbody = document.querySelector('#notes-table tbody');
-      tbody.innerHTML = '';
-      let total = 0;
-      let coefTotal = 0;
-      for (let matiere in notes) {
-        const { note, coef } = notes[matiere];
-        const observation = note >= 10 ? 'Validé' : 'Non validé';
-        total += note * coef;
-        coefTotal += coef;
-        const row = `<tr><td>${matiere}</td><td>${note}</td><td>${coef}</td><td>${observation}</td></tr>`;
-        tbody.innerHTML += row;
-      }
-      const moyenne = (total / coefTotal).toFixed(2);
-      document.getElementById('moyenne').textContent = moyenne;
+    function logout() {
+      document.getElementById("login-section").style.display = "block";
+      document.getElementById("notes-section").style.display = "none";
+      document.getElementById("matricule").value = "";
+      document.getElementById("password").value = "";
+    }
+
+    function togglePassword() {
+      const pwd = document.getElementById("password");
+      pwd.type = pwd.type === "password" ? "text" : "password";
     }
 
     async function telechargerPDF() {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
 
-     
+      const logoImg = new Image();
+      logoImg.crossOrigin = "anonymous";
+      logoImg.src = "https://play-lh.googleusercontent.com/DC93kQMi5GwtH56VC7VbyezeIqdxVl0fkP6cgsaAaqyqvQjwJcP0fj7vnqqNImK1TQ";
+      logoImg.onload = () => {
+        doc.addImage(logoImg, 'PNG', 160, 10, 30, 30);
 
-      doc.setFontSize(12);
-      doc.text("République Algérienne Démocratique et Populaire", 105, 20, null, null, 'center');
-      doc.text("Ministère de l’Education Nationale", 105, 27, null, null, 'center');
-      doc.text("Groupe scolaire privé : Elitkane Elilmi", 105, 34, null, null, 'center');
+        doc.setFontSize(12);
+        doc.text("République Algérienne Démocratique et Populaire", 105, 20, null, null, 'center');
+        doc.text("Ministère de l’Education Nationale", 105, 27, null, null, 'center');
+        doc.text("Groupe scolaire privé : Elitkane Elilmi", 105, 34, null, null, 'center');
 
-      doc.setFontSize(14);
-      doc.setFont(undefined, 'bold');
-      doc.text("Relevé de Notes", 105, 45, null, null, 'center');
+        doc.setFontSize(14);
+        doc.setFont(undefined, 'bold');
+        doc.text("Relevé de Notes", 105, 45, null, null, 'center');
 
-      doc.setFont(undefined, 'normal');
-      doc.setFontSize(12);
-      doc.text(`Matricule: ${currentEleve.matricule}`, 20, 55);
-      doc.text(`Nom: ${currentEleve.nom}`, 20, 62);
-      doc.text(`Prénom: ${currentEleve.prenom}`, 20, 69);
+        doc.setFontSize(12);
+        doc.setFont(undefined, 'normal');
+        doc.text(`Matricule: ${currentEleve.matricule}`, 20, 55);
+        doc.text(`Nom: ${currentEleve.nom}`, 20, 62);
+        doc.text(`Prénom: ${currentEleve.prenom}`, 20, 69);
 
-      const rows = [];
-      document.querySelectorAll("#notes-table tbody tr").forEach(tr => {
-        const cols = tr.querySelectorAll("td");
-        rows.push([
-          cols[0].innerText,
-          cols[1].innerText,
-          cols[2].innerText,
-          cols[3].innerText
-        ]);
-      });
+        const rows = [];
+        document.querySelectorAll("#notes-table tbody tr").forEach(tr => {
+          const cols = tr.querySelectorAll("td");
+          rows.push([
+            cols[0].innerText,
+            cols[1].innerText,
+            cols[2].innerText,
+            cols[3].innerText
+          ]);
+        });
 
-      doc.autoTable({
-        head: [["Matière", "Note", "Coefficient", "Observation"]],
-        body: rows,
-        startY: 75,
-        margin: { left: 10, right: 10 },
-        theme: 'grid'
-      });
+        doc.autoTable({
+          head: [["Matière", "Note", "Coefficient", "Observation"]],
+          body: rows,
+          startY: 75,
+          margin: { left: 10, right: 10 },
+          theme: 'grid'
+        });
 
-      const moyenne = document.getElementById('moyenne').textContent;
-      doc.text(`Moyenne: ${moyenne}`, 20, doc.lastAutoTable.finalY + 10);
+        const moyenne = document.getElementById('moyenne').textContent;
+        doc.text(`Moyenne: ${moyenne}`, 20, doc.lastAutoTable.finalY + 10);
 
-      const today = new Date();
-      const dateStr = today.toLocaleDateString();
-      doc.text(`Date : ${dateStr}`, 20, doc.lastAutoTable.finalY + 20);
-      doc.text("Signature du Directeur", 140, doc.lastAutoTable.finalY + 20);
+        const today = new Date();
+        doc.text(`Date : ${today.toLocaleDateString()}`, 20, doc.lastAutoTable.finalY + 20);
+        doc.text("Signature du Fondateur", 140, doc.lastAutoTable.finalY + 15);
+	doc.text("Abdelhakim ZENNOUCHE", 140, doc.lastAutoTable.finalY + 20);
+        doc.addImage("https://cdn.prod.website-files.com/61d7de73eec437f52da6d699/62161cf7328ad280841f653f_esignature-signature.png", 'PNG', 145, doc.lastAutoTable.finalY + 25, 40, 20);
 
-      doc.setFontSize(10);
-      doc.text("Le fondateur de l'école Abdelhakim ZENNOUCHE et toute son équipe pédagogique", 105, 280, null, null, 'center');
-      doc.text("vous souhaitent courage, réussite et excellence pour les épreuves officielles du BEM et du BAC.", 105, 285, null, null, 'center');
+        doc.setFontSize(10);
+        doc.text("Le fondateur de l'école Abdelhakim ZENNOUCHE et toute son équipe pédagogique", 105, 280, null, null, 'center');
+        doc.text("vous adressent leurs encouragements chaleureux et vous souhaitent une pleine réussite pour les épreuves du BEM et du BAC.", 105, 285, null, null, 'center');
 
-      doc.save("notes.pdf");
+        doc.save(`${currentEleve.prenom}_${currentEleve.nom}.pdf`);
+      }
     }
   </script>
 </body>
