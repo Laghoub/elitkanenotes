@@ -25,7 +25,7 @@
       border-radius: 20px;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
       width: 100%;
-      max-width: 600px;
+      max-width: 700px;
       animation: fadeIn 1s ease-in-out;
     }
     h2 {
@@ -81,11 +81,11 @@
       margin-bottom: 1rem;
       font-weight: bold;
     }
-    .message-final {
-      margin-top: 2rem;
+    .message-footer {
+      margin-top: 1.5rem;
       font-size: 0.9rem;
-      color: #555;
       text-align: center;
+      color: #444;
     }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(-20px); }
@@ -104,7 +104,6 @@
     <input type="text" id="matricule" placeholder="Matricule" />
     <input type="password" id="password" placeholder="Mot de passe" />
     <button onclick="login()">Se connecter</button>
-    <p id="error-message" style="color: red; text-align: center; margin-top: 1rem; display: none;">Matricule ou mot de passe incorrect</p>
   </div>
 
   <div class="container notes-section" id="notes-section">
@@ -123,7 +122,10 @@
     </table>
     <p><strong>Moyenne :</strong> <span id="moyenne"></span></p>
     <button class="download-btn" onclick="telechargerPDF()">Télécharger en PDF</button>
-    <p class="message-final">Le fondateur de l'école Abdelhakim ZENNOUCHE et toute son équipe pédagogique vous adressent leurs vœux de réussite pour les Épreuves officielles du BEM et du BAC.</p>
+    <div class="message-footer">
+      Le fondateur de l'école Abdelhakim ZENNOUCHE et toute son équipe pédagogique<br>
+      vous souhaitent courage, réussite et excellence pour les épreuves officielles du BEM et du BAC.
+    </div>
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -135,23 +137,17 @@
         "nom": "Ali",
         "prenom": "Yassine",
         "notes": {
-          "Math": { note: 14, coef: 5 },
-          "Physique": { note: 13, coef: 4 },
-          "Chimie": { note: 12, coef: 3 },
-          "Français": { note: 15, coef: 2 },
-          "Anglais": { note: 16, coef: 2 }
-        }
-      },
-      "67890": {
-        "password": "bac2024",
-        "nom": "Benali",
-        "prenom": "Sara",
-        "notes": {
-          "Math": { note: 11, coef: 5 },
-          "Physique": { note: 10, coef: 4 },
-          "SVT": { note: 13, coef: 3 },
-          "Français": { note: 12, coef: 2 },
-          "Philosophie": { note: 14, coef: 2 }
+          "Langue Arabe": { note: 14, coef: 5 },
+          "Mathématiques": { note: 15, coef: 4 },
+          "Langue Française": { note: 13, coef: 3 },
+          "Langue Anglaise": { note: 12, coef: 2 },
+          "sciences de la vie": { note: 13, coef: 2 },
+          "Physique": { note: 14, coef: 2 },
+          "Histoire géo": { note: 11, coef: 3 },
+          "éducation civique": { note: 16, coef: 1 },
+          "sciences islamique": { note: 17, coef: 2 },
+          "dessin": { note: 15, coef: 1 },
+          "sport": { note: 18, coef: 1 }
         }
       }
     };
@@ -161,7 +157,6 @@
     function login() {
       const matricule = document.getElementById('matricule').value;
       const password = document.getElementById('password').value;
-      const errorMessage = document.getElementById('error-message');
 
       if (data[matricule] && data[matricule].password === password) {
         currentEleve = data[matricule];
@@ -171,8 +166,7 @@
         document.getElementById('login-section').style.display = 'none';
         document.getElementById('notes-section').style.display = 'block';
       } else {
-        errorMessage.style.display = 'block';
-        setTimeout(() => { errorMessage.style.display = 'none'; }, 3000);
+        alert('Matricule ou mot de passe incorrect');
       }
     }
 
@@ -197,18 +191,22 @@
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
 
-      
+     
 
       doc.setFontSize(12);
-      doc.text("République Algérienne Démocratique et Populaire", 20, 15);
-      doc.text("Ministère de l’Education Nationale", 20, 22);
-      doc.text("Groupe scolaire privé : ITKAN EL ILMI", 20, 29);
+      doc.text("République Algérienne Démocratique et Populaire", 105, 20, null, null, 'center');
+      doc.text("Ministère de l’Education Nationale", 105, 27, null, null, 'center');
+      doc.text("Groupe scolaire privé : Elitkane Elilmi", 105, 34, null, null, 'center');
 
       doc.setFontSize(14);
-      doc.text(`Nom: ${currentEleve.nom} | Prénom: ${currentEleve.prenom} | Matricule: ${currentEleve.matricule}`, 20, 40);
+      doc.setFont(undefined, 'bold');
+      doc.text("Relevé de Notes", 105, 45, null, null, 'center');
 
-      doc.setFontSize(16);
-      doc.text("Relevé de Notes", 20, 50);
+      doc.setFont(undefined, 'normal');
+      doc.setFontSize(12);
+      doc.text(`Matricule: ${currentEleve.matricule}`, 20, 55);
+      doc.text(`Nom: ${currentEleve.nom}`, 20, 62);
+      doc.text(`Prénom: ${currentEleve.prenom}`, 20, 69);
 
       const rows = [];
       document.querySelectorAll("#notes-table tbody tr").forEach(tr => {
@@ -224,7 +222,9 @@
       doc.autoTable({
         head: [["Matière", "Note", "Coefficient", "Observation"]],
         body: rows,
-        startY: 55
+        startY: 75,
+        margin: { left: 10, right: 10 },
+        theme: 'grid'
       });
 
       const moyenne = document.getElementById('moyenne').textContent;
@@ -236,8 +236,8 @@
       doc.text("Signature du Directeur", 140, doc.lastAutoTable.finalY + 20);
 
       doc.setFontSize(10);
-      doc.text("Le fondateur de l'école Abdelhakim ZENNOUCHE et toute son équipe pédagogique vous souhaitent", 20, 280);
-      doc.text("bon courage et plein de succès pour les Épreuves officielles du BEM et du BAC.", 20, 285);
+      doc.text("Le fondateur de l'école Abdelhakim ZENNOUCHE et toute son équipe pédagogique", 105, 280, null, null, 'center');
+      doc.text("vous souhaitent courage, réussite et excellence pour les épreuves officielles du BEM et du BAC.", 105, 285, null, null, 'center');
 
       doc.save("notes.pdf");
     }
