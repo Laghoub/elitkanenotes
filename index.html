@@ -6,15 +6,22 @@
   <title>Espace Élève</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" rel="stylesheet">
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
     body {
       background: linear-gradient(135deg, #667eea, #764ba2);
       min-height: 100vh;
-      font-family: 'Poppins', sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
       padding: 2rem;
     }
+
     .container, .welcome {
       background: white;
       padding: 2rem;
@@ -25,16 +32,31 @@
       text-align: center;
       display: none;
     }
+
     .container.active, .welcome.active {
       display: block;
     }
+
+    .logo {
+      display: block;
+      margin: 0 auto 1.5rem auto;
+      max-width: 80px;
+    }
+
+    h2 {
+      margin-bottom: 1rem;
+      color: #333;
+    }
+
     input, button {
       width: 100%;
       padding: 0.8rem;
       margin: 0.5rem 0;
       border-radius: 10px;
       border: 1px solid #ccc;
+      font-size: 1rem;
     }
+
     button {
       background-color: #667eea;
       color: white;
@@ -42,9 +64,11 @@
       cursor: pointer;
       transition: 0.3s;
     }
+
     button:hover {
       background-color: #5a67d8;
     }
+
     .avatar {
       width: 100px;
       height: 100px;
@@ -58,10 +82,59 @@
       color: white;
       font-weight: bold;
     }
+
     .message {
       margin-top: 1rem;
       font-size: 1.1rem;
       color: #333;
+      line-height: 1.6;
+    }
+
+    .dates-section {
+      margin-top: 2rem;
+      text-align: left;
+    }
+
+    .dates-section h3 {
+      color: #333;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .dates-section ul {
+      list-style: none;
+      padding-left: 0;
+      font-size: 0.95rem;
+    }
+
+    .dates-section li {
+      margin-bottom: 0.5rem;
+      line-height: 1.4;
+    }
+
+    .pdf-link {
+      margin-top: 1rem;
+      text-align: center;
+    }
+
+    .pdf-link a {
+      color: #667eea;
+      text-decoration: underline;
+      font-weight: bold;
+    }
+
+    @media (max-width: 500px) {
+      .container, .welcome {
+        padding: 1.5rem;
+      }
+
+      input, button {
+        font-size: 0.95rem;
+      }
+
+      .message {
+        font-size: 1rem;
+      }
     }
   </style>
 </head>
@@ -69,13 +142,14 @@
 
   <!-- Connexion -->
   <div class="container active" id="login-section">
+    <img src="logo itkan.png" alt="Logo" class="logo" />
     <h2>Connexion Élève</h2>
     <input type="text" id="matricule" placeholder="Matricule" />
     <input type="password" id="password" placeholder="Mot de passe" />
     <button onclick="login()">Se connecter</button>
   </div>
 
-  <!-- Message de bienvenue -->
+  <!-- Message de bienvenue + infos -->
   <div class="welcome" id="welcome-section">
     <div class="avatar">👤</div>
     <h2 id="nomComplet">Nom Prénom</h2>
@@ -83,6 +157,20 @@
       Aucune note n’est affichée pour l’instant.<br>
       Les notes seront disponibles à partir du <strong>25 mai 2025</strong>.
     </p>
+
+    <div class="dates-section">
+      <h3>Dates importantes :</h3>
+      <ul>
+        <li>📅 Épreuves de BEM blanc : <strong>du 18 mai au 20 mai 2025</strong></li>
+        <li>📅 Épreuves de BAC blanc : <strong>du 18 mai au 22 mai 2025</strong></li>
+        <li>📅 Épreuves nationales de BEM : <strong>du 01 au 03 juin 2025</strong></li>
+        <li>📅 Épreuves nationales de BAC : <strong>du 15 au 19 juin 2025</strong></li>
+      </ul>
+
+      <div class="pdf-link">
+        📄 <a href="edt_bac.pdf" target="_blank">Télécharger l'emploi du temps du BAC blanc</a>
+      </div>
+    </div>
   </div>
 
   <script>
