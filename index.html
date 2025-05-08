@@ -98,15 +98,25 @@
 
   <!-- PAGE DE CONNEXION -->
   <div class="container" id="login-section">
-    <img src="logo itkan.png" alt="Logo ITKAN" class="logo" />
+    <img src="logo.png" alt="Logo ITKAN" class="logo" />
     <h1 style="font-size: 1.4rem; margin-bottom: 0.3rem;">Consultation des Notes</h1>
     <p style="font-size: 0.95rem; color: #555; margin-bottom: 1rem;">
-      Examens BEM & BAC Blanc – Session 2025
+      Examens BEM & BAC BLANC  – Session 2025
     </p>
+
+    <div class="countdowns" style="margin-top: 2rem;">
+      <h3>⏳ Comptes à rebours :</h3>
+      <p><strong>BEM :</strong> <span id="countdown-bem">Calcul...</span></p>
+      <p><strong>BAC :</strong> <span id="countdown-bac">Calcul...</span></p>
+    </div>
   
     <input type="text" id="matricule" placeholder="Votre matricule" />
     <input type="password" id="password" placeholder="Mot de passe" />
     <button onclick="login()">Consulter mes notes</button>
+
+    <div class="footer" style="font-size: 0.8rem; color: #888; margin-top: 2rem;">
+      <p>Développé par <strong style="color: #555;">Nassim LAGHOUB</strong></p>
+    </div>
   </div>
 
   <!-- PAGE MESSAGE APRÈS CONNEXION -->
@@ -130,6 +140,9 @@
       <p>
         📄 <a href="edt_bem.pdf" target="_blank">Emploi du temps des épreuves de BEM blanc (PDF)</a>
       </p>
+    </div>
+    <div class="footer" style="font-size: 0.8rem; color: #888; margin-top: 2rem;">
+      <p>Développé par <strong style="color: #555;">Nassim LAGHOUB</strong></p>
     </div>
   </div>
 
@@ -158,6 +171,42 @@
       }
     }
   </script>
+
+<script>
+  function updateCountdown(id, targetDate) {
+    const countdownElement = document.getElementById(id);
+
+    function update() {
+      const now = new Date();
+      const distance = targetDate - now;
+
+      if (distance <= 0) {
+        countdownElement.textContent = "C'est le jour J !";
+        return;
+      }
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      countdownElement.textContent = `${days}j ${hours}h ${minutes}m ${seconds}s`;
+    }
+
+    update(); // appel initial
+    setInterval(update, 1000); // mise à jour toutes les secondes
+  }
+
+  // Dates cibles
+  const bemDate = new Date('2025-06-01T08:30:00');
+  const bacDate = new Date('2025-06-15T08:00:00');
+
+  // Lancer les comptes à rebours après le chargement
+  window.addEventListener('load', () => {
+    updateCountdown('countdown-bem', bemDate);
+    updateCountdown('countdown-bac', bacDate);
+  });
+</script>
 
 </body>
 </html>
