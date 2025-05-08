@@ -115,7 +115,7 @@
     <button onclick="login()">Consulter mes notes</button>
 
     <div class="footer" style="font-size: 0.8rem; color: #888; margin-top: 2rem;">
-      <p>Développé par <strong style="color: #555;">Nassim LAGHOUB</strong></p>
+      <p>Réalisé par <strong style="color: #555;">Nassim LAGHOUB</strong></p>
     </div>
   </div>
 
@@ -129,20 +129,17 @@
     <div class="dates">
       <h3>Dates importantes :</h3>
       <ul>
-        <li>📅 Épreuves de BEM blanc : <strong>du 12 mai au 14 mai 2025</strong></li>
-        <li>📅 Épreuves de BAC blanc : <strong>du 11 mai au 15 mai 2025</strong></li>
-        <li>📅 Épreuves nationales de BEM : <strong>du 01 au 03 juin 2025</strong></li>
-        <li>📅 Épreuves nationales de BAC : <strong>du 15 au 19 juin 2025</strong></li>
+       
       </ul>
-      <p>
+      <p style="display: none;">
         📄 <a href="edt_bac.pdf" target="_blank">Emploi du temps des épreuves de BAC blanc (PDF)</a>
       </p>
-      <p>
+      <p style="display: none;">
         📄 <a href="edt_bem.pdf" target="_blank">Emploi du temps des épreuves de BEM blanc (PDF)</a>
       </p>
     </div>
     <div class="footer" style="font-size: 0.8rem; color: #888; margin-top: 2rem;">
-      <p>Développé par <strong style="color: #555;">Nassim LAGHOUB</strong></p>
+      <p>Réalisé par <strong style="color: #555;">Nassim LAGHOUB</strong></p>
     </div>
   </div>
 
@@ -156,20 +153,44 @@
         elevesData = data;
       });
 
-    function login() {
-      const matricule = document.getElementById('matricule').value.trim();
-      const password = document.getElementById('password').value.trim();
+      function login() {
+  const matricule = document.getElementById('matricule').value.trim();
+  const password = document.getElementById('password').value.trim();
 
-      const eleve = elevesData.find(e => e.MATRICULE === matricule && e.PASSWORD === password);
+  const eleve = elevesData.find(e => e.MATRICULE === matricule && e.PASSWORD === password);
 
-      if (eleve) {
-        document.getElementById('login-section').style.display = 'none';
-        document.getElementById('message-section').style.display = 'block';
-        document.getElementById('welcome-name').textContent = `Bienvenue ${eleve.PRENOM} ${eleve.NOM}`;
-      } else {
-        alert("Matricule ou mot de passe incorrect.");
-      }
+  if (eleve) {
+    document.getElementById('login-section').style.display = 'none';
+    document.getElementById('message-section').style.display = 'block';
+    document.getElementById('welcome-name').textContent = `Bienvenue ${eleve.PRENOM} ${eleve.NOM}`;
+
+    const datesSection = document.querySelector('.dates ul');
+    const linksContainer = document.querySelectorAll('.dates p');
+    
+    datesSection.innerHTML = ''; // Vider les anciennes dates
+    linksContainer.forEach(p => p.style.display = 'none'); // Cacher tous les liens PDF
+
+    if (eleve.CLASSE === "4AM") {
+      datesSection.innerHTML += `
+        <li>📅 Épreuves de BEM blanc : <strong>du 12 mai au 14 mai 2025</strong></li>
+        <li>📅 Épreuves nationales de BEM : <strong>du 01 au 03 juin 2025</strong></li>
+      `;
+      // Afficher uniquement le lien BEM
+      document.querySelector('a[href="edt_bem.pdf"]').parentElement.style.display = 'block';
+    } else {
+      datesSection.innerHTML += `
+        <li>📅 Épreuves de BAC blanc : <strong>du 11 mai au 15 mai 2025</strong></li>
+        <li>📅 Épreuves nationales de BAC : <strong>du 15 au 19 juin 2025</strong></li>
+      `;
+      // Afficher uniquement le lien BAC
+      document.querySelector('a[href="edt_bac.pdf"]').parentElement.style.display = 'block';
     }
+
+  } else {
+    alert("Matricule ou mot de passe incorrect.");
+  }
+}
+
   </script>
 
 <script>
