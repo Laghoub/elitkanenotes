@@ -3,11 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Connexion Élève - ITKAN</title>
+  <title>Consultation des Notes</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" rel="stylesheet">
   <style>
     * {
-      margin: 0; padding: 0;
+      margin: 0;
+      padding: 0;
       box-sizing: border-box;
       font-family: 'Poppins', sans-serif;
     }
@@ -25,15 +26,12 @@
       border-radius: 20px;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
       width: 100%;
-      max-width: 400px;
-      text-align: center;
-    }
-    .logo {
-      display: block;
-      margin: 0 auto 1rem;
-      max-width: 100px;
+      max-width: 700px;
+      animation: fadeIn 1s ease-in-out;
+      margin: 2rem 0;
     }
     h2 {
+      text-align: center;
       margin-bottom: 1rem;
     }
     input {
@@ -42,6 +40,16 @@
       margin: 0.5rem 0;
       border-radius: 10px;
       border: 1px solid #ccc;
+    }
+    .password-wrapper {
+      position: relative;
+    }
+    .toggle-password {
+      position: absolute;
+      top: 50%;
+      right: 15px;
+      transform: translateY(-50%);
+      cursor: pointer;
     }
     button {
       width: 100%;
@@ -53,51 +61,65 @@
       font-weight: bold;
       border-radius: 10px;
       cursor: pointer;
+      transition: background 0.3s;
     }
-    .message-section {
+    button:hover {
+      background-color: #5a67d8;
+    }
+    .notes-section {
       display: none;
-      max-width: 500px;
-      margin: auto;
-      background: white;
-      padding: 2rem;
-      border-radius: 20px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      animation: slideIn 0.5s ease-in-out forwards;
+    }
+    .logo {
+      display: block;
+      margin: 0 auto 1rem auto;
+      max-width: 100px;
+    }
+    .info-eleve {
+      margin-bottom: 1rem;
+      font-weight: bold;
       text-align: center;
     }
-    .avatar {
-      width: 80px;
-      border-radius: 50%;
-      margin-bottom: 1rem;
+    .download-btn {
+      margin-top: 1rem;
+      background: #48bb78;
     }
-    .dates {
-      margin-top: 2rem;
-      text-align: left;
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
     }
-    .dates h3 {
-      margin-bottom: 0.5rem;
-      color: #333;
+    th, td {
+      border: 1px solid #ccc;
+      padding: 0.5rem;
+      text-align: center;
+      white-space: nowrap;
     }
-    .dates ul {
-      list-style: disc;
-      padding-left: 1.5rem;
-      margin-bottom: 1rem;
+    .message-footer {
+      margin-top: 1.5rem;
+      font-size: 0.9rem;
+      text-align: center;
+      color: #444;
     }
-    .dates a {
-      color: #2b6cb0;
-      text-decoration: underline;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
-
-    @media (max-width: 500px) {
-      .container, .message-section {
-        padding: 1rem;
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-100px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @media (max-width: 600px) {
+      table {
+        display: block;
+        overflow-x: auto;
       }
     }
   </style>
 </head>
 <body>
-
-  <!-- PAGE DE CONNEXION -->
   <div class="container" id="login-section">
+    <center>
     <img src="logo.png" alt="Logo ITKAN" class="logo" />
     <h1 style="font-size: 1.4rem; margin-bottom: 0.3rem;">Consultation des Notes</h1>
     <p style="font-size: 0.95rem; color: #555; margin-bottom: 1rem;">
@@ -117,84 +139,38 @@
     <div class="footer" style="font-size: 0.8rem; color: #888; margin-top: 2rem;">
       <p>Réalisé par <strong style="color: #555;">Nassim LAGHOUB</strong></p>
     </div>
+    </center>
   </div>
 
-  <!-- PAGE MESSAGE APRÈS CONNEXION -->
-  <div class="message-section" id="message-section">
-    <img src="https://www.shutterstock.com/image-vector/blank-avatar-photo-icon-design-600nw-1682415103.jpg" class="avatar" alt="Avatar">
-    <h2 id="welcome-name"></h2>
-    <p style="margin-top: 1rem;">Aucune note n’est affichée pour l’instant.<br>
-      Les notes seront disponibles à partir du <strong>18 mai 2025</strong>.</p>
-
-    <div class="dates">
-      <h3>Dates importantes :</h3>
-      <ul>
-       
-      </ul>
-      <p style="display: none;">
-        📄 <a href="edt_bac.pdf" target="_blank">Emploi du temps des épreuves de BAC blanc (PDF)</a>
-      </p>
-      <p style="display: none;">
-        📄 <a href="edt_bem.pdf" target="_blank">Emploi du temps des épreuves de BEM blanc (PDF)</a>
-      </p>
+  <div class="container notes-section" id="notes-section">
+    <h2>Vos Notes</h2>
+       <div class="info-eleve" id="info-eleve"></div>
+    <div style="overflow-x:auto; margin-top: 1rem;">
+      <table id="notes-table">
+        <thead>
+          <tr>
+            <th>Matière</th>
+            <th>Note</th>
+            <th>Coefficient</th>
+            <th>Observation</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
     </div>
-    <div class="footer" style="font-size: 0.8rem; color: #888; margin-top: 2rem;">
-      <p>Réalisé par <strong style="color: #555;">Nassim LAGHOUB</strong></p>
+    <p><strong>Moyenne :</strong> <span id="moyenne"></span></p>
+    <button class="download-btn" onclick="telechargerPDF()" disabled>Télécharger en PDF</button>
+    <div class="message-footer">
+      Le fondateur de l'école Abdelhakim ZENNOUCHE et toute son équipe pédagogique<br>
+      vous adressent leurs encouragements chaleureux et vous souhaitent une pleine réussite pour les épreuves du BEM et du BAC.
     </div>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
   <script>
-    let elevesData = [];
 
-    // Charger les données JSON au démarrage
-    fetch('eleves.json')
-      .then(response => response.json())
-      .then(data => {
-        elevesData = data;
-      });
-
-      function login() {
-  const matricule = document.getElementById('matricule').value.trim();
-  const password = document.getElementById('password').value.trim();
-
-  const eleve = elevesData.find(e => e.MATRICULE === matricule && e.PASSWORD === password);
-
-  if (eleve) {
-    document.getElementById('login-section').style.display = 'none';
-    document.getElementById('message-section').style.display = 'block';
-    document.getElementById('welcome-name').textContent = `Bienvenue ${eleve.PRENOM} ${eleve.NOM}`;
-
-    const datesSection = document.querySelector('.dates ul');
-    const linksContainer = document.querySelectorAll('.dates p');
-    
-    datesSection.innerHTML = ''; // Vider les anciennes dates
-    linksContainer.forEach(p => p.style.display = 'none'); // Cacher tous les liens PDF
-
-    if (eleve.CLASSE === "4AM") {
-      datesSection.innerHTML += `
-        <li>📅 Épreuves de BEM blanc : <strong>du 12 mai au 14 mai 2025</strong></li>
-        <li>📅 Épreuves nationales de BEM : <strong>du 01 au 03 juin 2025</strong></li>
-      `;
-      // Afficher uniquement le lien BEM
-      document.querySelector('a[href="edt_bem.pdf"]').parentElement.style.display = 'block';
-    } else {
-      datesSection.innerHTML += `
-        <li>📅 Épreuves de BAC blanc : <strong>du 11 mai au 15 mai 2025</strong></li>
-        <li>📅 Épreuves nationales de BAC : <strong>du 15 au 19 juin 2025</strong></li>
-      `;
-      // Afficher uniquement le lien BAC
-      document.querySelector('a[href="edt_bac.pdf"]').parentElement.style.display = 'block';
-    }
-
-  } else {
-    alert("Matricule ou mot de passe incorrect.");
-  }
-}
-
-  </script>
-
-<script>
-  function updateCountdown(id, targetDate) {
+     function updateCountdown(id, targetDate) {
     const countdownElement = document.getElementById(id);
 
     function update() {
@@ -227,7 +203,161 @@
     updateCountdown('countdown-bem', bemDate);
     updateCountdown('countdown-bac', bacDate);
   });
-</script>
+    let data = [];
+fetch('eleves_matieres.json')
+  .then(response => response.json())
+  .then(json => data = json)
+  .catch(err => alert("Erreur lors du chargement des données élèves: " + err));
 
+
+    let currentEleve = null;
+
+    function getObservation(note) {
+      if (note >= 17) return "Excellent travail !";
+      if (note >= 14) return "Très bien, continue comme ça.";
+      if (note >= 12) return "Bon, mais peut mieux faire.";
+      if (note >= 10) return "Passable, attention à l'effort.";
+      return "Tu dois faire mieux.";
+    }
+
+function login() {
+  const matricule = document.getElementById('matricule').value.trim();
+  const password = document.getElementById('password').value;
+
+  const eleve = data.find(d => d.MATRICULE === matricule && d.PASSWORD === password);
+
+  if (eleve) {
+    currentEleve = eleve;
+
+    const tableBody = document.querySelector("#notes-table tbody");
+    tableBody.innerHTML = "";
+
+    // Liste des champs à ignorer (non-matières)
+    const ignoreFields = ["MATRICULE", "PASSWORD", "NOM", "PRENOM", "CLASSE"];
+
+    // Coefficients associés aux matières
+    const coefficients = {
+      "Mathématiques": 5,
+      "physique": 4,
+      "sciences": 3,
+      "arabe": 2,
+      "français": 2,
+      "anglais": 2,
+      "Histoire-Géo": 2,
+      "sciences islamiques": 2,
+      "philosophie": 3
+    };
+
+    let total = 0;
+    let coefTotal = 0;
+
+    for (const [matiere, note] of Object.entries(eleve)) {
+      if (!ignoreFields.includes(matiere)) {
+        const noteNum = parseFloat(note);
+        const coef = coefficients[matiere] || 1;
+
+        if (!isNaN(noteNum)) {
+          total += noteNum * coef;
+          coefTotal += coef;
+
+          tableBody.innerHTML += `
+            <tr>
+              <td>${matiere}</td>
+              <td>${noteNum}</td>
+              <td>${coef}</td>
+              <td>${getObservation(noteNum)}</td>
+            </tr>`;
+        }
+      }
+    }
+
+    const moyenne = coefTotal > 0 ? (total / coefTotal).toFixed(2) : "N/A";
+    document.getElementById("moyenne").textContent = "non encore calculée";
+    document.getElementById("info-eleve").innerHTML =
+  `Nom: ${eleve.NOM}<br>Prénom: ${eleve.PRENOM}<br>Matricule: ${eleve.MATRICULE}<br>`;
+    document.getElementById("login-section").style.display = "none";
+    document.getElementById("notes-section").style.display = "block";
+  } else {
+    alert("Matricule ou mot de passe incorrect");
+  }
+}
+
+
+
+    
+
+    function logout() {
+      document.getElementById("login-section").style.display = "block";
+      document.getElementById("notes-section").style.display = "none";
+      document.getElementById("matricule").value = "";
+      document.getElementById("password").value = "";
+    }
+
+    function togglePassword() {
+      const pwd = document.getElementById("password");
+      pwd.type = pwd.type === "password" ? "text" : "password";
+    }
+
+    async function telechargerPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      const logoImg = new Image();
+      logoImg.crossOrigin = "anonymous";
+      logoImg.src = "https://play-lh.googleusercontent.com/DC93kQMi5GwtH56VC7VbyezeIqdxVl0fkP6cgsaAaqyqvQjwJcP0fj7vnqqNImK1TQ";
+      logoImg.onload = () => {
+        doc.addImage(logoImg, 'PNG', 160, 10, 30, 30);
+
+        doc.setFontSize(12);
+        doc.text("République Algérienne Démocratique et Populaire", 105, 20, null, null, 'center');
+        doc.text("Ministère de l’Education Nationale", 105, 27, null, null, 'center');
+        doc.text("Groupe scolaire privé : Elitkane Elilmi", 105, 34, null, null, 'center');
+
+        doc.setFontSize(14);
+        doc.setFont(undefined, 'bold');
+        doc.text("Relevé de Notes", 105, 45, null, null, 'center');
+
+        doc.setFontSize(12);
+        doc.setFont(undefined, 'normal');
+        doc.text(`Matricule: ${currentEleve.matricule}`, 20, 55);
+        doc.text(`Nom: ${currentEleve.nom}`, 20, 62);
+        doc.text(`Prénom: ${currentEleve.prenom}`, 20, 69);
+
+        const rows = [];
+        document.querySelectorAll("#notes-table tbody tr").forEach(tr => {
+          const cols = tr.querySelectorAll("td");
+          rows.push([
+            cols[0].innerText,
+            cols[1].innerText,
+            cols[2].innerText,
+            cols[3].innerText
+          ]);
+        });
+
+        doc.autoTable({
+          head: [["Matière", "Note", "Coefficient", "Observation"]],
+          body: rows,
+          startY: 75,
+          margin: { left: 10, right: 10 },
+          theme: 'grid'
+        });
+
+        const moyenne = document.getElementById('moyenne').textContent;
+        doc.text(`Moyenne: ${moyenne}`, 20, doc.lastAutoTable.finalY + 10);
+
+        const today = new Date();
+        doc.text(`Date : ${today.toLocaleDateString()}`, 20, doc.lastAutoTable.finalY + 20);
+        doc.text("Signature du Fondateur", 140, doc.lastAutoTable.finalY + 15);
+	doc.text("Abdelhakim ZENNOUCHE", 140, doc.lastAutoTable.finalY + 20);
+        doc.addImage("https://cdn.prod.website-files.com/61d7de73eec437f52da6d699/62161cf7328ad280841f653f_esignature-signature.png", 'PNG', 145, doc.lastAutoTable.finalY + 25, 40, 20);
+
+        doc.setFontSize(10);
+        doc.text("Le fondateur de l'école Abdelhakim ZENNOUCHE et toute son équipe pédagogique", 105, 280, null, null, 'center');
+        doc.text("vous adressent leurs encouragements chaleureux et vous souhaitent une pleine réussite pour les épreuves du BEM et du BAC.", 105, 285, null, null, 'center');
+
+        doc.save(`${currentEleve.prenom}_${currentEleve.nom}.pdf`);
+      }
+    }
+  </script>
 </body>
 </html>
